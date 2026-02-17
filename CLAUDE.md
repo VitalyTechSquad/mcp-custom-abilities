@@ -39,7 +39,6 @@ Cada ability es una llamada a `wp_register_ability()` con: `input_schema`, `outp
 - **Categorías solo por ID** — las tags aceptan nombres (se auto-crean), pero las categorías requieren IDs de términos existentes
 - **Whitelist de MIME en medios**: Solo `image/jpeg`, `image/png`, `image/gif`, `image/webp` — otros tipos se rechazan silenciosamente
 - **Sin operaciones batch** — Claude debe orquestar operaciones multi-item llamando a las abilities en secuencia
-- **Plugin URI desactualizada** — La cabecera PHP todavía referencia `github.com/vitalytech/` en vez de `VitalyTechSquad`
 
 ## Añadir una Nueva Ability
 
