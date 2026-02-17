@@ -65,7 +65,7 @@ Permite crear, editar, eliminar posts, gestionar categorías, etiquetas e imáge
 
 ### Opción 1: Descarga directa
 
-1. Descarga el archivo ZIP del plugin desde [Releases](https://github.com/vitalytech/mcp-custom-abilities/releases)
+1. Descarga el archivo ZIP del plugin desde [Releases](https://github.com/VitalyTechSquad/mcp-custom-abilities/releases)
 2. Ve a **Plugins → Añadir nuevo → Subir plugin** en tu WordPress
 3. Sube el archivo ZIP y activa el plugin
 
@@ -73,13 +73,13 @@ Permite crear, editar, eliminar posts, gestionar categorías, etiquetas e imáge
 
 ```bash
 cd wp-content/plugins/
-git clone https://github.com/vitalytech/mcp-custom-abilities.git
+git clone https://github.com/VitalyTechSquad/mcp-custom-abilities.git
 ```
 
 ### Opción 3: Vía Composer
 
 ```bash
-composer require vitalytech/mcp-custom-abilities
+composer require vitalytech-squad/mcp-custom-abilities
 ```
 
 ### Activación
@@ -333,7 +333,7 @@ Para imágenes destacadas optimizadas para redes sociales: **1200x630 píxeles**
 
 ### Reportar Bugs
 
-Usa [GitHub Issues](https://github.com/vitalytech/mcp-custom-abilities/issues) para reportar bugs o sugerir mejoras.
+Usa [GitHub Issues](https://github.com/VitalyTechSquad/mcp-custom-abilities/issues) para reportar bugs o sugerir mejoras.
 
 ---
 
