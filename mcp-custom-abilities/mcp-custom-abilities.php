@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: MCP Custom Abilities
- * Plugin URI: https://github.com/vitalytech/mcp-custom-abilities
+ * Plugin URI: https://github.com/VitalyTechSquad/mcp-custom-abilities
  * Description: Abilities personalizadas para gestionar WordPress desde Claude/MCP. Permite crear, editar, eliminar posts, gestionar categorías, etiquetas e imágenes destacadas directamente desde Claude o cualquier cliente MCP.
  * Version: 2.0.0
  * Author: VitalyTech
