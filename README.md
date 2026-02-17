@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/License-GPL%20v2-orange" alt="License GPL v2">
 </p>
 
-Plugin de WordPress que proporciona **abilities personalizadas** para gestionar tu sitio desde **Claude**, **Claude Code** o cualquier cliente compatible con el **Model Context Protocol (MCP)**.
+Plugin de WordPress que proporciona **19 abilities personalizadas** para gestionar tu sitio desde **Claude**, **Claude Code** o cualquier cliente compatible con el **Model Context Protocol (MCP)**.
 
 Permite crear, editar, eliminar posts, gestionar categorías, etiquetas e imágenes destacadas directamente desde una conversación con IA, sin necesidad de acceder al panel de WordPress.
 
@@ -133,13 +133,22 @@ Añade la configuración del servidor MCP en tu cliente. Ejemplo para Claude Des
 | `mcp-custom/delete-post` | Mueve a papelera o elimina permanentemente |
 | `mcp-custom/publish-post` | Publica un borrador rápidamente |
 
-### Categorías y Etiquetas
+### Categorías
 
 | Ability | Descripción |
 |---------|-------------|
 | `mcp-custom/list-categories` | Lista todas las categorías con conteo de posts |
 | `mcp-custom/create-category` | Crea una nueva categoría (con soporte para jerarquía) |
+| `mcp-custom/update-category` | Actualiza nombre, slug, descripción o padre de una categoría existente |
+| `mcp-custom/delete-category` | Elimina una categoría por su term ID |
+
+### Etiquetas
+
+| Ability | Descripción |
+|---------|-------------|
 | `mcp-custom/list-tags` | Lista todas las etiquetas |
+| `mcp-custom/create-tag` | Crea una nueva etiqueta |
+| `mcp-custom/delete-tag` | Elimina una etiqueta por su term ID |
 
 ### Medios e Imágenes
 
@@ -155,6 +164,7 @@ Añade la configuración del servidor MCP en tu cliente. Ejemplo para Claude Des
 | Ability | Descripción |
 |---------|-------------|
 | `mcp-custom/get-site-info` | Obtiene información básica del sitio |
+| `mcp-custom/get-current-user` | Devuelve información del usuario autenticado (ID, roles, capacidades) |
 
 ---
 
@@ -339,9 +349,14 @@ Usa [GitHub Issues](https://github.com/VitalyTechSquad/mcp-custom-abilities/issu
 
 ## 📜 Changelog
 
+### 2.1.0 (2026-02-17)
+- ✨ 4 nuevas abilities de taxonomías: `update-category`, `delete-category`, `create-tag`, `delete-tag`
+- 👤 Nueva ability `get-current-user` para obtener información del usuario autenticado
+- 📝 Total: 19 abilities disponibles
+
 ### 2.0.0 (2026-02-18)
 - ✨ Versión inicial pública
-- 📝 15 abilities para gestión completa de contenido
+- 📝 14 abilities para gestión completa de contenido
 - 🖼️ Soporte para subida de imágenes desde URL
 - 🏷️ Gestión de categorías y etiquetas
 - 🔒 Validación completa de permisos

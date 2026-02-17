@@ -4,10 +4,10 @@ Este fichero proporciona contexto a Claude Code (claude.ai/code) para trabajar c
 
 ## Descripcion del Proyecto
 
-**MCP Custom Abilities** — Plugin de WordPress (GPL v2) que expone 15 abilities MCP para gestionar posts, taxonomías, medios e información del sitio desde Claude o cualquier cliente MCP.
+**MCP Custom Abilities** — Plugin de WordPress (GPL v2) que expone 19 abilities MCP para gestionar posts, taxonomías, medios e información del sitio desde Claude o cualquier cliente MCP.
 
 **Repositorio:** https://github.com/VitalyTechSquad/mcp-custom-abilities
-**Version:** 2.0.0 | **WordPress:** 6.9+ | **PHP:** 7.4+
+**Version:** 2.1.0 | **WordPress:** 6.9+ | **PHP:** 7.4+
 
 Para requisitos completos, instalación, configuración del cliente MCP y lista detallada de abilities, consultar [README.md](README.md).
 
@@ -25,11 +25,11 @@ wp plugin activate mcp-adapter
 
 ## Arquitectura
 
-Plugin de un solo fichero: `mcp-custom-abilities/mcp-custom-abilities.php` (~1184 líneas)
+Plugin de un solo fichero: `mcp-custom-abilities/mcp-custom-abilities.php` (~1380 líneas)
 
 **Hooks utilizados (en orden):**
 1. `wp_abilities_api_categories_init` (prioridad 5) — registra la categoría `content-management`
-2. `wp_abilities_api_init` (prioridad 5) — registra las 15 abilities
+2. `wp_abilities_api_init` (prioridad 5) — registra las 19 abilities
 
 Cada ability es una llamada a `wp_register_ability()` con: `input_schema`, `output_schema`, `execute_callback`, `permission_callback` y `meta` (debe incluir `'mcp' => ['public' => true, 'type' => 'tool']`).
 

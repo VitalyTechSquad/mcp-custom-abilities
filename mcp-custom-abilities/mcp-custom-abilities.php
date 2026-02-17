@@ -3,7 +3,7 @@
  * Plugin Name: MCP Custom Abilities
  * Plugin URI: https://github.com/VitalyTechSquad/mcp-custom-abilities
  * Description: Abilities personalizadas para gestionar WordPress desde Claude/MCP. Permite crear, editar, eliminar posts, gestionar categorías, etiquetas e imágenes destacadas directamente desde Claude o cualquier cliente MCP.
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: VitalyTech
  * Author URI: https://mododebug.vitalytech.es
  * License: GPL v2 or later
@@ -1180,5 +1180,261 @@ add_action('wp_abilities_api_init', function() {
             'mcp' => ['public' => true, 'type' => 'tool']
         ]
     ]);
-    
+
+    // ── delete-category ─────────────────────────────────────────────────────
+    wp_register_ability('mcp-custom/delete-category', [
+        'label'       => __('Delete Category', 'mcp-custom-abilities'),
+        'description' => __('Deletes an existing category by term ID.', 'mcp-custom-abilities'),
+        'category'    => 'content-management',
+        'input_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'term_id' => [
+                    'type'        => 'integer',
+                    'description' => __('ID of the category to delete.', 'mcp-custom-abilities'),
+                ],
+                'force' => [
+                    'type'        => 'boolean',
+                    'description' => __('If true, also removes the category from orphaned posts.', 'mcp-custom-abilities'),
+                    'default'     => false,
+                ],
+            ],
+            'required' => ['term_id'],
+        ],
+        'output_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'success' => ['type' => 'boolean'],
+                'message' => ['type' => 'string'],
+            ],
+        ],
+        'execute_callback' => function($input) {
+            $term_id = intval($input['term_id']);
+            $category = get_category($term_id);
+            if (!$category || is_wp_error($category)) {
+                return ['success' => false, 'message' => __('Category not found.', 'mcp-custom-abilities')];
+            }
+            $result = wp_delete_category($term_id);
+            if (is_wp_error($result)) {
+                return ['success' => false, 'message' => $result->get_error_message()];
+            }
+            if ($result === false) {
+                return ['success' => false, 'message' => __('Failed to delete category.', 'mcp-custom-abilities')];
+            }
+            return ['success' => true, 'message' => __('Category deleted successfully.', 'mcp-custom-abilities')];
+        },
+        'permission_callback' => function() {
+            return current_user_can('manage_categories');
+        },
+        'meta' => [
+            'show_in_rest' => true,
+            'mcp' => ['public' => true, 'type' => 'tool']
+        ]
+    ]);
+
+    // ── update-category ──────────────────────────────────────────────────────
+    wp_register_ability('mcp-custom/update-category', [
+        'label'       => __('Update Category', 'mcp-custom-abilities'),
+        'description' => __('Updates name, slug, description or parent of an existing category.', 'mcp-custom-abilities'),
+        'category'    => 'content-management',
+        'input_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'term_id'     => ['type' => 'integer', 'description' => __('ID of the category to update.', 'mcp-custom-abilities')],
+                'name'        => ['type' => 'string',  'description' => __('New name for the category.', 'mcp-custom-abilities')],
+                'slug'        => ['type' => 'string',  'description' => __('New slug for the category.', 'mcp-custom-abilities')],
+                'description' => ['type' => 'string',  'description' => __('New description.', 'mcp-custom-abilities')],
+                'parent'      => ['type' => 'integer', 'description' => __('Parent category term ID (0 for top-level).', 'mcp-custom-abilities')],
+            ],
+            'required' => ['term_id'],
+        ],
+        'output_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'success' => ['type' => 'boolean'],
+                'term_id' => ['type' => 'integer'],
+                'name'    => ['type' => 'string'],
+                'slug'    => ['type' => 'string'],
+            ],
+        ],
+        'execute_callback' => function($input) {
+            $term_id = intval($input['term_id']);
+            $category = get_category($term_id);
+            if (!$category || is_wp_error($category)) {
+                return ['success' => false, 'term_id' => $term_id, 'name' => '', 'slug' => ''];
+            }
+            $args = [];
+            if (!empty($input['name']))        $args['name']        = sanitize_text_field($input['name']);
+            if (!empty($input['slug']))        $args['slug']        = sanitize_title($input['slug']);
+            if (isset($input['description']))  $args['description'] = sanitize_text_field($input['description']);
+            if (isset($input['parent']))       $args['parent']      = intval($input['parent']);
+
+            if (empty($args)) {
+                return ['success' => false, 'term_id' => $term_id, 'name' => $category->name, 'slug' => $category->slug];
+            }
+            $result = wp_update_term($term_id, 'category', $args);
+            if (is_wp_error($result)) {
+                return ['success' => false, 'term_id' => $term_id, 'name' => $category->name, 'slug' => $category->slug];
+            }
+            $updated = get_category($result['term_id']);
+            return [
+                'success' => true,
+                'term_id' => intval($result['term_id']),
+                'name'    => $updated->name,
+                'slug'    => $updated->slug,
+            ];
+        },
+        'permission_callback' => function() {
+            return current_user_can('manage_categories');
+        },
+        'meta' => [
+            'show_in_rest' => true,
+            'mcp' => ['public' => true, 'type' => 'tool']
+        ]
+    ]);
+
+    // ── create-tag ───────────────────────────────────────────────────────────
+    wp_register_ability('mcp-custom/create-tag', [
+        'label'       => __('Create Tag', 'mcp-custom-abilities'),
+        'description' => __('Creates a new post tag.', 'mcp-custom-abilities'),
+        'category'    => 'content-management',
+        'input_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'name'        => ['type' => 'string', 'description' => __('Name of the new tag.', 'mcp-custom-abilities')],
+                'slug'        => ['type' => 'string', 'description' => __('Slug for the new tag (optional, auto-generated if empty).', 'mcp-custom-abilities')],
+                'description' => ['type' => 'string', 'description' => __('Description of the tag.', 'mcp-custom-abilities')],
+            ],
+            'required' => ['name'],
+        ],
+        'output_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'success' => ['type' => 'boolean'],
+                'tag_id'  => ['type' => 'integer'],
+                'name'    => ['type' => 'string'],
+                'slug'    => ['type' => 'string'],
+            ],
+        ],
+        'execute_callback' => function($input) {
+            $name = sanitize_text_field($input['name']);
+            $args = [];
+            if (!empty($input['slug']))        $args['slug']        = sanitize_title($input['slug']);
+            if (isset($input['description']))  $args['description'] = sanitize_text_field($input['description']);
+
+            $result = wp_insert_term($name, 'post_tag', $args);
+            if (is_wp_error($result)) {
+                return ['success' => false, 'tag_id' => 0, 'name' => $name, 'slug' => ''];
+            }
+            $tag = get_term($result['term_id'], 'post_tag');
+            return [
+                'success' => true,
+                'tag_id'  => intval($result['term_id']),
+                'name'    => $tag->name,
+                'slug'    => $tag->slug,
+            ];
+        },
+        'permission_callback' => function() {
+            return current_user_can('manage_categories');
+        },
+        'meta' => [
+            'show_in_rest' => true,
+            'mcp' => ['public' => true, 'type' => 'tool']
+        ]
+    ]);
+
+    // ── delete-tag ───────────────────────────────────────────────────────────
+    wp_register_ability('mcp-custom/delete-tag', [
+        'label'       => __('Delete Tag', 'mcp-custom-abilities'),
+        'description' => __('Deletes an existing post tag by term ID.', 'mcp-custom-abilities'),
+        'category'    => 'content-management',
+        'input_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'term_id' => ['type' => 'integer', 'description' => __('ID of the tag to delete.', 'mcp-custom-abilities')],
+            ],
+            'required' => ['term_id'],
+        ],
+        'output_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'success' => ['type' => 'boolean'],
+                'message' => ['type' => 'string'],
+            ],
+        ],
+        'execute_callback' => function($input) {
+            $term_id = intval($input['term_id']);
+            $tag = get_term($term_id, 'post_tag');
+            if (!$tag || is_wp_error($tag)) {
+                return ['success' => false, 'message' => __('Tag not found.', 'mcp-custom-abilities')];
+            }
+            $result = wp_delete_term($term_id, 'post_tag');
+            if (is_wp_error($result)) {
+                return ['success' => false, 'message' => $result->get_error_message()];
+            }
+            if ($result === false) {
+                return ['success' => false, 'message' => __('Failed to delete tag.', 'mcp-custom-abilities')];
+            }
+            return ['success' => true, 'message' => __('Tag deleted successfully.', 'mcp-custom-abilities')];
+        },
+        'permission_callback' => function() {
+            return current_user_can('manage_categories');
+        },
+        'meta' => [
+            'show_in_rest' => true,
+            'mcp' => ['public' => true, 'type' => 'tool']
+        ]
+    ]);
+
+    // ── get-current-user ─────────────────────────────────────────────────────
+    wp_register_ability('mcp-custom/get-current-user', [
+        'label'       => __('Get Current User', 'mcp-custom-abilities'),
+        'description' => __('Returns information about the currently authenticated user.', 'mcp-custom-abilities'),
+        'category'    => 'content-management',
+        'input_schema' => [
+            'type'       => 'object',
+            'properties' => [],
+        ],
+        'output_schema' => [
+            'type' => 'object',
+            'properties' => [
+                'id'                   => ['type' => 'integer'],
+                'login'                => ['type' => 'string'],
+                'email'                => ['type' => 'string'],
+                'display_name'         => ['type' => 'string'],
+                'roles'                => ['type' => 'array', 'items' => ['type' => 'string']],
+                'capabilities_summary' => ['type' => 'array', 'items' => ['type' => 'string']],
+            ],
+        ],
+        'execute_callback' => function($input) {
+            $user = wp_get_current_user();
+            if (!$user || $user->ID === 0) {
+                return [
+                    'id'                   => 0,
+                    'login'                => '',
+                    'email'                => '',
+                    'display_name'         => '',
+                    'roles'                => [],
+                    'capabilities_summary' => [],
+                ];
+            }
+            $caps = array_keys(array_filter($user->allcaps));
+            return [
+                'id'                   => intval($user->ID),
+                'login'                => $user->user_login,
+                'email'                => $user->user_email,
+                'display_name'         => $user->display_name,
+                'roles'                => $user->roles,
+                'capabilities_summary' => $caps,
+            ];
+        },
+        'permission_callback' => function() {
+            return current_user_can('read');
+        },
+        'meta' => [
+            'show_in_rest' => true,
+            'mcp' => ['public' => true, 'type' => 'tool']
+        ]
+    ]);
+
 }, 5);
