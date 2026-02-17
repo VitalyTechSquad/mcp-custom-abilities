@@ -354,7 +354,7 @@ Usa [GitHub Issues](https://github.com/VitalyTechSquad/mcp-custom-abilities/issu
 - 👤 Nueva ability `get-current-user` para obtener información del usuario autenticado
 - 📝 Total: 19 abilities disponibles
 
-### 2.0.0 (2026-02-18)
+### 2.0.0 (2026-02-17)
 - ✨ Versión inicial pública
 - 📝 14 abilities para gestión completa de contenido
 - 🖼️ Soporte para subida de imágenes desde URL
